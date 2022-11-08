@@ -1,4 +1,6 @@
+const course = require("../models/course");
 const Course = require("../models/course");
+const serverError500 = require("../utils/serverError");
 
 exports.postNewCourse = (req, res, next) => {
   if (!req.file) {
@@ -20,10 +22,7 @@ exports.postNewCourse = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-        next(err);
-      }
+      serverError500(err);
     });
 };
 
@@ -38,10 +37,7 @@ exports.courseFeed = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-        next(err);
-      }
+      serverError500(err);
     });
 };
 
@@ -61,10 +57,7 @@ exports.getCourse = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-        next(err);
-      }
+      serverError500(err);
     });
 };
 
@@ -106,9 +99,28 @@ exports.editCourse = (req, res, next) => {
       res.status(200).json({ message: "Course updated!", course: result });
     })
     .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-        next(err);
+      serverError500(err);
+    });
+};
+
+exports.deleteCourse = (req, res, next) => {
+  const courseId = req.params.courseId;
+  Course.findById(courseId)
+    .then((course) => {
+      if (!course) {
+        const error = new Error("There is not such course");
+        error.statusCode = 404;
+        throw error;
       }
+      // Check logged in user
+      clearImage(course.courseThumbnail);
+      return Course.findByIdAndRemove(courseId);
+    })
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({ message: "Deleted successfully" });
+    })
+    .catch((err) => {
+      serverError500(err);
     });
 };

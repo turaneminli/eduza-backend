@@ -15,4 +15,7 @@ router.post("/course", courseController.postNewCourse);
 // PUT - Edit course
 router.put("/course/:courseId", courseController.editCourse);
 
+// DELETE - Delete course
+router.delete("/course/:courseId", courseController.deleteCourse);
+
 module.exports = router;
