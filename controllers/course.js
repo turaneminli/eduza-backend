@@ -1,5 +1,6 @@
 const course = require("../models/course");
 const Course = require("../models/course");
+const User = require("../models/user");
 const serverError500 = require("../utils/serverError");
 
 exports.postNewCourse = (req, res, next) => {
@@ -8,17 +9,32 @@ exports.postNewCourse = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
+  let creator;
   const newCourse = new Course({
     title: req.body.title,
     courseThumbnail: req.file.path,
+    creator: req.userId,
   });
   newCourse
     .save()
+    .then((course) => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      creator = user;
+      user.haveCourses.push(newCourse);
+      return user.save();
+    })
     .then((result) => {
       console.log(result);
       res.status(201).json({
         message: "Successfully posted",
-        course: result,
+        course: newCourse,
+        creator: {
+          _id: creator._id,
+          name: creator.name,
+          surname: creator.surname,
+        },
       });
     })
     .catch((err) => {

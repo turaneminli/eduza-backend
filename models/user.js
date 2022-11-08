@@ -24,6 +24,7 @@ const userSchema = new Schema(
       required: false,
     },
     haveCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+    enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
   },
   { timeptamps: true }
 );

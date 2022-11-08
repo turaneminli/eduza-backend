@@ -17,6 +17,11 @@ const courseSchema = new Schema(
         ref: "Review",
       },
     ],
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timeptamps: true }
 );

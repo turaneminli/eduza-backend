@@ -50,7 +50,7 @@ exports.login = (req, res, next) => {
         .compare(password, user.password)
         .then((isEqual) => {
           if (!isEqual) {
-            const error = new Error("Wrong password");
+            const error = new Error("Wrong password. ");
             error.statusCode = 401;
             throw error;
           }
