@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const courseController = require("../controllers/courseController");
+const courseController = require("../controllers/course");
 
-// Course feed
+// Course Feed (All the posts are listed)
 router.get("/courses", courseController.courseFeed);
 
-router.post("/courses", courseController.postNewCourse);
+// Get Single Course
+router.get("/course/:courseId", courseController.getCourse);
+
+// Create New Course
+router.post("/course", courseController.postNewCourse);
 
 module.exports = router;

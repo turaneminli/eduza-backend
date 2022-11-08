@@ -1,6 +1,6 @@
 # Eduza
 
-Server-side of the Eduza project which aims to bring education closer to everyone. 
+Server-side of the Eduza project which aims to bring education closer to everyone.
 
 ## Installation
 
