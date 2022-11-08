@@ -54,8 +54,19 @@ app.use(cors());
 
 // routes
 const courseRoutes = require("./routes/course");
+const authRoutes = require("./routes/auth");
 
 app.use(courseRoutes);
+app.use("/auth", authRoutes);
+
+// error handling
+app.use((error, req, res, next) => {
+  console.log(error);
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
+});
 
 // database connnection
 require("dotenv").config();

@@ -11,13 +11,19 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    profilePhoto: {
+    email: {
+      type: String,
+      require: true,
+    },
+    password: {
       type: String,
       required: true,
     },
-    haveCourses: [
-      { type: Schema.Types.ObjectId, ref: "Course", required: true },
-    ],
+    profilePhoto: {
+      type: String,
+      required: false,
+    },
+    haveCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
   },
   { timeptamps: true }
 );
