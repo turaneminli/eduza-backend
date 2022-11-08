@@ -10,6 +10,11 @@ Use the package manager [npm]to install node_modules.
 npm install
 ```
 
+## Configuration
+
+- You should change .example.env to .env and add your credentials.
+- You should create "images" folder to the path in order to receive the uploaded images.
+
 ## Running
 
 After running the following line, watch port 8080.
@@ -17,3 +22,4 @@ After running the following line, watch port 8080.
 ```bash
 npm start
 ```
+
