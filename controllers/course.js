@@ -28,12 +28,24 @@ exports.postNewCourse = (req, res, next) => {
 
 // returns the list of courses with review (populated)
 exports.courseFeed = (req, res, next) => {
+  const currentPage = req.query.page || 1;
+  const perPage = 6; // number of courses in one page
+  let totalItems;
   Course.find()
+    .countDocuments()
+    .then((count) => {
+      totalItems = count;
+      return Course.find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    })
     // .populate("review")
     .then((result) => {
       console.log(result);
       res.status(200).json({
         allCourses: result,
+        totalItems: totalItems,
+        message: "Fetched successfully",
       });
     })
     .catch((err) => {

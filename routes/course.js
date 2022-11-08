@@ -4,6 +4,8 @@ const router = express.Router();
 const courseController = require("../controllers/course");
 
 // GET - Course Feed (All the posts are listed)
+
+// /courses?page=8 (paginator)
 router.get("/courses", courseController.courseFeed);
 
 // GET -  Single Course
