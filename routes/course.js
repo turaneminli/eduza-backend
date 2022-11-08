@@ -3,13 +3,16 @@ const router = express.Router();
 
 const courseController = require("../controllers/course");
 
-// Course Feed (All the posts are listed)
+// GET - Course Feed (All the posts are listed)
 router.get("/courses", courseController.courseFeed);
 
-// Get Single Course
+// GET -  Single Course
 router.get("/course/:courseId", courseController.getCourse);
 
-// Create New Course
+// POST - Create New Course
 router.post("/course", courseController.postNewCourse);
+
+// PUT - Edit course
+router.put("/course/:courseId", courseController.editCourse);
 
 module.exports = router;

@@ -1,9 +1,14 @@
 const Course = require("../models/course");
 
-// Posting New Course with only title
 exports.postNewCourse = (req, res, next) => {
+  if (!req.file) {
+    const error = new Error("Image is not uploaded");
+    error.statusCode = 422;
+    throw error;
+  }
   const newCourse = new Course({
     title: req.body.title,
+    courseThumbnail: req.file.path,
   });
   newCourse
     .save()
@@ -54,6 +59,51 @@ exports.getCourse = (req, res, next) => {
         course: course,
         message: "Course successfully fetched",
       });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+        next(err);
+      }
+    });
+};
+
+// Update Course
+const clearImage = require("../utils/clearImage");
+
+exports.editCourse = (req, res, next) => {
+  const courseId = req.params.courseId;
+  const newTitle = req.body.title;
+  let courseThumbnail = req.body.image; // url
+
+  // checking if there is not any image in the edit we do not change the image
+  // could be buggy yet!!!
+  if (req.file) {
+    courseThumbnail = req.file.path;
+  }
+  if (!courseThumbnail) {
+    const error = new Error("You should specify image");
+    error.statusCode = 422;
+    throw error;
+  }
+
+  Course.findById(courseId)
+    .then((course) => {
+      if (!course) {
+        const error = new Error("There is not such course");
+        error.statusCode = 404;
+        throw error;
+      }
+      if (courseThumbnail !== course.courseThumbnail) {
+        clearImage(course.courseThumbnail);
+      }
+      course.title = newTitle;
+      course.courseThumbnail = courseThumbnail;
+      // console.log(course);
+      return course.save();
+    })
+    .then((result) => {
+      res.status(200).json({ message: "Course updated!", course: result });
     })
     .catch((err) => {
       if (!err.statusCode) {

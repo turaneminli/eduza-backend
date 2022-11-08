@@ -1,18 +1,42 @@
 const express = require("express");
-
 const mongoose = require("mongoose");
-require("dotenv").config();
-
 const bodyParser = require("body-parser");
-const cors = require("cors");
-
-const courseRoutes = require("./routes/course");
-
 const app = express();
 const path = require("path");
+const multer = require("multer");
+const cors = require("cors");
+
+// image uploads
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    // replace : with - because Windows does not support ":"
+    cb(
+      null,
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
+    );
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 // middleware
 app.use(bodyParser.json());
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 // CORS configuration
@@ -29,9 +53,12 @@ app.use(cors());
 // });
 
 // routes
+const courseRoutes = require("./routes/course");
+
 app.use(courseRoutes);
 
 // database connnection
+require("dotenv").config();
 const username = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
 const connectionString = `mongodb+srv://${username}:${password}@eduza-cluster.i7xuimv.mongodb.net/?retryWrites=true&w=majority`;

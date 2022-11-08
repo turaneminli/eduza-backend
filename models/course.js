@@ -9,7 +9,7 @@ const courseSchema = new Schema(
     },
     courseThumbnail: {
       type: String,
-      required: false,
+      required: true,
     },
     review: [
       {
