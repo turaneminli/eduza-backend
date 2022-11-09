@@ -2,12 +2,12 @@ const course = require("../models/course");
 const Course = require("../models/course");
 const User = require("../models/user");
 const serverError500 = require("../utils/serverError");
+const checkAuthorization = require("../utils/checkAuthorization");
+const customError = require("../utils/customError");
 
 exports.postNewCourse = (req, res, next) => {
   if (!req.file) {
-    const error = new Error("Image is not uploaded");
-    error.statusCode = 422;
-    throw error;
+    throw new customError("Image is not uploaded.  ", 422);
   }
   let creator;
   const newCourse = new Course({
@@ -74,9 +74,7 @@ exports.getCourse = (req, res, next) => {
   Course.findById(courseId)
     .then((course) => {
       if (!course) {
-        const error = new Error("Could not find the course");
-        error.statusCode = 404;
-        throw error;
+        throw new customError("Could not find the course.   ", 404);
       }
       console.log("The course is " + course);
       res.status(200).json({
@@ -103,18 +101,15 @@ exports.editCourse = (req, res, next) => {
     courseThumbnail = req.file.path;
   }
   if (!courseThumbnail) {
-    const error = new Error("You should specify image");
-    error.statusCode = 422;
-    throw error;
+    throw new customError("Tou should specify the image. ", 422);
   }
 
   Course.findById(courseId)
     .then((course) => {
       if (!course) {
-        const error = new Error("There is not such course");
-        error.statusCode = 404;
-        throw error;
+        throw new customError("There is not such course", 404);
       }
+      checkAuthorization(course, req);
       if (courseThumbnail !== course.courseThumbnail) {
         clearImage(course.courseThumbnail);
       }
@@ -136,11 +131,9 @@ exports.deleteCourse = (req, res, next) => {
   Course.findById(courseId)
     .then((course) => {
       if (!course) {
-        const error = new Error("There is not such course");
-        error.statusCode = 404;
-        throw error;
+        throw new customError("There is not such course", 404);
       }
-      // Check logged in user
+      checkAuthorization(course, req);
       clearImage(course.courseThumbnail);
       return Course.findByIdAndRemove(courseId);
     })
@@ -149,6 +142,6 @@ exports.deleteCourse = (req, res, next) => {
       res.status(200).json({ message: "Deleted successfully" });
     })
     .catch((err) => {
-      serverError500(err);
+      console.log(err);
     });
 };

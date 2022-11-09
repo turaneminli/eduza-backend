@@ -3,15 +3,13 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const serverError500 = require("../utils/serverError");
 const jwt = require("jsonwebtoken");
+const customError = require("../utils/customError");
 require("dotenv").config({ path: "../.env" });
 
 exports.signup = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new Error("Validation failed");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
+    throw new customError("Validation failed!", 422, errors.array());
   }
   const email = req.body.email;
   const password = req.body.password;
@@ -41,18 +39,17 @@ exports.login = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        const error = new Error("A user with this email could not be found");
-        error.statusCode = 401;
-        throw error;
+        throw new customError(
+          "A user with this email could not be found.",
+          401
+        );
       }
       loadedUser = user;
       bcrypt
         .compare(password, user.password)
         .then((isEqual) => {
           if (!isEqual) {
-            const error = new Error("Wrong password. ");
-            error.statusCode = 401;
-            throw error;
+            throw new customError("Wrong password. ", 401);
           }
           const token = jwt.sign(
             {
@@ -68,5 +65,5 @@ exports.login = (req, res, next) => {
         })
         .catch((err) => console.log(err));
     })
-    .catch((err) => serverError500(err));
+    .catch((err) => console.log(err));
 };
