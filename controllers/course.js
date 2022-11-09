@@ -138,7 +138,14 @@ exports.deleteCourse = (req, res, next) => {
       return Course.findByIdAndRemove(courseId);
     })
     .then((result) => {
-      console.log(result);
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      user.haveCourses.pull(courseId);
+      // console.log(result);
+      return user.save();
+    })
+    .then((result) => {
       res.status(200).json({ message: "Deleted successfully" });
     })
     .catch((err) => {
