@@ -131,7 +131,7 @@ exports.deleteCourse = (req, res, next) => {
   Course.findById(courseId)
     .then((course) => {
       if (!course) {
-        throw new customError("There is not such course", 404);
+        throw next(new customError("There is not such course", 404));
       }
       checkAuthorization(course, req, "course");
       clearImage(course.courseThumbnail);
@@ -218,12 +218,9 @@ exports.deleteReview = async (req, res, next) => {
   console.log(reviewId);
   try {
     const review = await Review.findById(reviewId);
-    console.log(review);
-    if (review === null) {
-      console.log("I am here");
-      throw new customError("There is not such review", 404);
+    if (!review) {
+      throw next(new customError("There is not such review", 404));
     }
-    console.log("I am here also");
     // checkAuthorization(review, req, "review");
     await Review.findByIdAndRemove(reviewId);
     const course = await Course.findById(courseId);
