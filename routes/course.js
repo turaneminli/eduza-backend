@@ -28,9 +28,13 @@ router.get("/course/:courseId/reviews", isAuth, courseController.getReviews);
 router.post("/course/:courseId/review", isAuth, courseController.postReview);
 
 // // PUT - Edit review for the course
-// router.put("/course/:courseId/review", isAuth, courseController.editReview);
+router.put("/course/:courseId/:reviewId", isAuth, courseController.editReview);
 
 // // PUT - Edit review for the course
-// router.delete("/course/:courseId/review", isAuth, courseController.editReview);
+router.delete(
+  "/course/:courseId/:reviewId",
+  isAuth,
+  courseController.deleteReview
+);
 
 module.exports = router;

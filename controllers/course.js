@@ -39,7 +39,7 @@ exports.postNewCourse = (req, res, next) => {
       });
     })
     .catch((err) => {
-      serverError500(err);
+      serverError500(err, next);
     });
 };
 
@@ -65,7 +65,7 @@ exports.courseFeed = (req, res, next) => {
       });
     })
     .catch((err) => {
-      serverError500(err);
+      serverError500(err, next);
     });
 };
 
@@ -83,7 +83,7 @@ exports.getCourse = (req, res, next) => {
       });
     })
     .catch((err) => {
-      serverError500(err);
+      serverError500(err, next);
     });
 };
 
@@ -109,7 +109,7 @@ exports.editCourse = (req, res, next) => {
       if (!course) {
         throw new customError("There is not such course", 404);
       }
-      checkAuthorization(course, req);
+      checkAuthorization(course, req, "course");
       if (courseThumbnail !== course.courseThumbnail) {
         clearImage(course.courseThumbnail);
       }
@@ -122,7 +122,7 @@ exports.editCourse = (req, res, next) => {
       res.status(200).json({ message: "Course updated!", course: result });
     })
     .catch((err) => {
-      serverError500(err);
+      serverError500(err, next);
     });
 };
 
@@ -133,7 +133,7 @@ exports.deleteCourse = (req, res, next) => {
       if (!course) {
         throw new customError("There is not such course", 404);
       }
-      checkAuthorization(course, req);
+      checkAuthorization(course, req, "course");
       clearImage(course.courseThumbnail);
       return Course.findByIdAndRemove(courseId);
     })
@@ -149,7 +149,7 @@ exports.deleteCourse = (req, res, next) => {
       res.status(200).json({ message: "Deleted successfully" });
     })
     .catch((err) => {
-      console.log(err);
+      serverError500(err, next);
     });
 };
 
@@ -162,7 +162,7 @@ exports.getReviews = (req, res, next) => {
         .json({ reviews: reviews, message: "Fetched reviews successfully." });
     })
     .catch((err) => {
-      console.log(err);
+      serverError500(err, next);
     });
 };
 
@@ -186,6 +186,51 @@ exports.postReview = async (req, res, next) => {
       .status(201)
       .json({ newReview: review, message: "Review created successfully." });
   } catch (err) {
-    console.log(err);
+    serverError500(err, next);
+  }
+};
+
+exports.editReview = async (req, res, next) => {
+  const newComment = req.body.comment;
+  const newScore = req.body.score;
+  // const courseId = req.params.courseId;
+  const reviewId = req.params.reviewId;
+  try {
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      throw new customError("There is not such review", 404);
+    }
+    review.comment = newComment;
+    review.score = newScore;
+    const result = await review.save();
+    res.status(200).json({
+      editedReview: result,
+      message: "You edited review successfully. ",
+    });
+  } catch (err) {
+    serverError500(err, next);
+  }
+};
+
+exports.deleteReview = async (req, res, next) => {
+  const reviewId = req.params.reviewId;
+  const courseId = req.params.courseId;
+  console.log(reviewId);
+  try {
+    const review = await Review.findById(reviewId);
+    console.log(review);
+    if (review === null) {
+      console.log("I am here");
+      throw new customError("There is not such review", 404);
+    }
+    console.log("I am here also");
+    // checkAuthorization(review, req, "review");
+    await Review.findByIdAndRemove(reviewId);
+    const course = await Course.findById(courseId);
+    course.review.pull(reviewId);
+    await course.save();
+    res.status(200).json({ message: "Review deleted successfully" });
+  } catch (err) {
+    serverError500(err, next);
   }
 };

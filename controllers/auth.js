@@ -29,7 +29,7 @@ exports.signup = (req, res, next) => {
     .then((result) => {
       res.status(201).json({ message: "User created!", userId: result._id });
     })
-    .catch((err) => serverError500(err));
+    .catch((err) => serverError500(err, next));
 };
 
 exports.login = (req, res, next) => {
@@ -63,7 +63,7 @@ exports.login = (req, res, next) => {
             .status(200)
             .json({ token: token, userId: loadedUser._id.toString() });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => serverError500(err, next));
     })
-    .catch((err) => console.log(err));
+    .catch((err) => serverError500(err, next));
 };
