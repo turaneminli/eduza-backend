@@ -215,7 +215,7 @@ exports.editReview = async (req, res, next) => {
 exports.deleteReview = async (req, res, next) => {
   const reviewId = req.params.reviewId;
   const courseId = req.params.courseId;
-  console.log(reviewId);
+  // console.log(reviewId);
   try {
     const review = await Review.findById(reviewId);
     if (!review) {
