@@ -27,4 +27,6 @@ const reviewSchema = new Schema(
   { timeptamps: true }
 );
 
+// add average score
+
 module.exports = mongoose.model("Review", reviewSchema);

@@ -21,4 +21,16 @@ router.put("/course/:courseId", isAuth, courseController.editCourse);
 // DELETE - Delete course
 router.delete("/course/:courseId", isAuth, courseController.deleteCourse);
 
+// GET - Get Reviews of the course
+router.get("/course/:courseId/reviews", isAuth, courseController.getReviews);
+
+// POST - Create new review for the course
+router.post("/course/:courseId/review", isAuth, courseController.postReview);
+
+// // PUT - Edit review for the course
+// router.put("/course/:courseId/review", isAuth, courseController.editReview);
+
+// // PUT - Edit review for the course
+// router.delete("/course/:courseId/review", isAuth, courseController.editReview);
+
 module.exports = router;

@@ -3,6 +3,7 @@ const Course = require("../models/course");
 const User = require("../models/user");
 const serverError500 = require("../utils/serverError");
 const checkAuthorization = require("../utils/checkAuthorization");
+const Review = require("../models/review");
 const customError = require("../utils/customError");
 
 exports.postNewCourse = (req, res, next) => {
@@ -42,7 +43,7 @@ exports.postNewCourse = (req, res, next) => {
     });
 };
 
-// returns the list of courses with review (populated)
+// returns the list of courses
 exports.courseFeed = (req, res, next) => {
   const currentPage = req.query.page || 1;
   const perPage = 6; // number of courses in one page
@@ -55,7 +56,6 @@ exports.courseFeed = (req, res, next) => {
         .skip((currentPage - 1) * perPage)
         .limit(perPage);
     })
-    // .populate("review")
     .then((result) => {
       console.log(result);
       res.status(200).json({
@@ -151,4 +151,41 @@ exports.deleteCourse = (req, res, next) => {
     .catch((err) => {
       console.log(err);
     });
+};
+
+exports.getReviews = (req, res, next) => {
+  const courseId = req.params.courseId;
+  Review.find({ course: courseId })
+    .then((reviews) => {
+      res
+        .status(200)
+        .json({ reviews: reviews, message: "Fetched reviews successfully." });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+exports.postReview = async (req, res, next) => {
+  const comment = req.body.comment;
+  const score = req.body.score;
+  const courseId = req.params.courseId;
+  const author = req.userId;
+  const newReview = new Review({
+    author: author,
+    course: courseId,
+    score: score,
+    comment: comment,
+  });
+  try {
+    const review = await newReview.save();
+    const course = await Course.findById(courseId);
+    course.review.push(review);
+    await course.save();
+    res
+      .status(201)
+      .json({ newReview: review, message: "Review created successfully." });
+  } catch (err) {
+    console.log(err);
+  }
 };
