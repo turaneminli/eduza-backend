@@ -6,6 +6,12 @@ const path = require("path");
 const multer = require("multer");
 const cors = require("cors");
 
+// swagger ui
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger_output.json");
+
+app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
 // image uploads
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -77,7 +83,7 @@ mongoose
   .connect(connectionString)
   .then((result) => {
     // console.log(result);
-    app.listen(8080);
+    app.listen(8082);
   })
   .catch((err) => {
     console.log(err);
