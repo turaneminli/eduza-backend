@@ -37,4 +37,10 @@ router.delete(
   courseController.deleteReview
 );
 
+router.get("/courses/:categoryId", courseController.getByCategory);
+
+router.get("/categories", courseController.getCategoryList);
+
+router.post("/category", courseController.createCategory);
+
 module.exports = router;

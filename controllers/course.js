@@ -5,6 +5,7 @@ const serverError500 = require("../utils/serverError");
 const checkAuthorization = require("../utils/checkAuthorization");
 const Review = require("../models/review");
 const customError = require("../utils/customError");
+const Category = require("../models/category");
 
 exports.postNewCourse = (req, res, next) => {
   if (!req.file) {
@@ -15,6 +16,7 @@ exports.postNewCourse = (req, res, next) => {
     title: req.body.title,
     courseThumbnail: req.file.path,
     creator: req.userId,
+    cat: req.body.category,
   });
   newCourse
     .save()
@@ -93,6 +95,7 @@ const clearImage = require("../utils/clearImage");
 exports.editCourse = (req, res, next) => {
   const courseId = req.params.courseId;
   const newTitle = req.body.title;
+  const newCategory = req.body.category;
   let courseThumbnail = req.body.image; // url
 
   // checking if there is not any image in the edit we do not change the image
@@ -115,6 +118,7 @@ exports.editCourse = (req, res, next) => {
       }
       course.title = newTitle;
       course.courseThumbnail = courseThumbnail;
+      course.cat = newCategory;
       // console.log(course);
       return course.save();
     })
@@ -227,6 +231,44 @@ exports.deleteReview = async (req, res, next) => {
     course.review.pull(reviewId);
     await course.save();
     res.status(200).json({ message: "Review deleted successfully" });
+  } catch (err) {
+    serverError500(err, next);
+  }
+};
+
+exports.getCategoryList = async (req, res, next) => {
+  try {
+    const categories = await Category.find();
+    res.status(200).json({
+      categories: categories,
+    });
+  } catch (err) {
+    serverError500(err, next);
+  }
+};
+
+exports.getByCategory = async (req, res, next) => {
+  const categoryId = req.params.categoryId;
+  try {
+    const courses = await Course.find({ cat: categoryId });
+    res.status(200).json({
+      courses: courses,
+      message: `Fetched ${(await Category.findById(categoryId)).name}`,
+    });
+  } catch (err) {
+    serverError500(err, next);
+  }
+};
+
+exports.createCategory = async (req, res, next) => {
+  const name = req.body.name;
+  const description = req.body.description;
+  const newCategory = new Category({ name: name, description: description });
+  try {
+    const category = await newCategory.save();
+    res.status(201).json({
+      newCategory: category,
+    });
   } catch (err) {
     serverError500(err, next);
   }

@@ -22,6 +22,11 @@ const courseSchema = new Schema(
       ref: "User",
       required: true,
     },
+    cat: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
   },
   { timeptamps: true }
 );
