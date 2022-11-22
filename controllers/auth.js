@@ -5,6 +5,17 @@ const serverError500 = require("../utils/serverError");
 const jwt = require("jsonwebtoken");
 const customError = require("../utils/customError");
 require("dotenv").config({ path: "../.env" });
+const nodemailer = require("nodemailer");
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_user: process.env.API_USER_SEND_GRID,
+      api_key: process.env.API_KEY_SEND_GRID,
+    },
+  })
+);
 
 exports.signup = (req, res, next) => {
   const errors = validationResult(req);
@@ -67,3 +78,7 @@ exports.login = (req, res, next) => {
     })
     .catch((err) => serverError500(err, next));
 };
+
+exports.resetPassword = (req, res, next) => {};
+
+exports.forgotPassword = (req, res, next) => {};
