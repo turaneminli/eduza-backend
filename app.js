@@ -38,8 +38,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// middleware
-app.use(bodyParser.json());
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
@@ -48,15 +46,18 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 // CORS configuration
 app.use(cors({ origin: "*" }));
 
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader(
-//     "Access-Control-Allow-Methods",
-//     "GET, POST, PUT, PATCH, DELETE"
-//   );
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   next();
-// });
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
+  next();
+});
+
+// middleware
+app.use(bodyParser.json());
 
 // routes
 const courseRoutes = require("./routes/course");
