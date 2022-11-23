@@ -11,7 +11,7 @@
     "http"
   ],
   "paths": {
-    "/signup": {
+    "/auth/signup": {
       "put": {
         "description": "",
         "parameters": [
@@ -44,7 +44,7 @@
         }
       }
     },
-    "/login": {
+    "/auth/login": {
       "post": {
         "description": "",
         "parameters": [
