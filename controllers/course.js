@@ -12,37 +12,44 @@ exports.postNewCourse = (req, res, next) => {
     throw new customError("Image is not uploaded.  ", 422);
   }
   let creator;
-  const newCourse = new Course({
-    title: req.body.title,
-    courseThumbnail: req.file.path,
-    creator: req.userId,
-    cat: req.body.category,
-  });
-  newCourse
-    .save()
-    .then((course) => {
-      return User.findById(req.userId);
-    })
-    .then((user) => {
-      creator = user;
-      user.haveCourses.push(newCourse);
-      return user.save();
-    })
-    .then((result) => {
-      console.log(result);
-      res.status(201).json({
-        message: "Successfully posted",
-        course: newCourse,
-        creator: {
-          _id: creator._id,
-          name: creator.name,
-          surname: creator.surname,
-        },
+  Category.findById(req.body.category).then((category) => {
+    if (!category) {
+      throw new customError("Category could not be found.", 422);
+    } else {
+      const newCourse = new Course({
+        title: req.body.title,
+        courseThumbnail: req.file.path,
+        creator: req.userId,
+        cat: req.body.category,
+        tutor: req.body.tutor,
       });
-    })
-    .catch((err) => {
-      serverError500(err, next);
-    });
+      newCourse
+        .save()
+        .then((course) => {
+          return User.findById(req.userId);
+        })
+        .then((user) => {
+          creator = user;
+          user.haveCourses.push(newCourse);
+          return user.save();
+        })
+        .then((result) => {
+          console.log(result);
+          res.status(201).json({
+            message: "Successfully posted",
+            course: newCourse,
+            creator: {
+              _id: creator._id,
+              name: creator.name,
+              surname: creator.surname,
+            },
+          });
+        })
+        .catch((err) => {
+          serverError500(err, next);
+        });
+    }
+  });
 };
 
 // returns the list of courses
@@ -91,6 +98,7 @@ exports.getCourse = (req, res, next) => {
 
 // Update Course
 const clearImage = require("../utils/clearImage");
+const e = require("cors");
 
 exports.editCourse = (req, res, next) => {
   const courseId = req.params.courseId;

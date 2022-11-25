@@ -27,6 +27,10 @@ const courseSchema = new Schema(
       ref: "Category",
       required: true,
     },
+    tutor: {
+      type: String,
+      required: true,
+    },
   },
   { timeptamps: true }
 );
